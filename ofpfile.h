@@ -33,7 +33,7 @@ struct mtk_ofp_hdr
     qshort   chksum;
 };
 
-struct MTKOFPMAP
+struct mtk_ofp_entry
 {
     char   name[32];
     qlong  offset;
@@ -82,7 +82,7 @@ public:
 public:
     static qbool extract_partition(qstr ofp_file, qstr part_name, QIODevice &io_dev);
 public:
-    static qbool UnpackOFPEntries(qstr ofp_file, QVector<MTKOFPMAP> &entries);
+    static qbool UnpackOFPEntries(qstr ofp_file, QVector<mtk_ofp_entry> &entries);
     static qbool extract_partitions(qstr ofp_file, qstrl parts, qstr super_part, qstr super_io);
     static qbool ConvertSparse(qstr super_part, qstr super_io);
 

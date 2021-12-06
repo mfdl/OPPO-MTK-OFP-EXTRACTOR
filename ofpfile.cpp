@@ -123,7 +123,7 @@ qbool OfpFile::mtk_ofp_gen_key(qbyte enc_ofp_buf, mtk_ofp_sec &ofp_key)
     return key_match;
 }
 
-qbool OfpFile::UnpackOFPEntries(qstr ofp_file, QVector<MTKOFPMAP> &entries)
+qbool OfpFile::UnpackOFPEntries(qstr ofp_file, QVector<mtk_ofp_entry> &entries)
 {
     if(!qfileinfo(ofp_file).size())
         return 0;
@@ -161,7 +161,7 @@ qbool OfpFile::UnpackOFPEntries(qstr ofp_file, QVector<MTKOFPMAP> &entries)
     qbyte entry_buf = io_dev.read(hdr_entries);
     mtk_shuffle(hdr_key, hdr_key.length(), entry_buf, hdr_entries);
 
-    MTKOFPMAP *ofp_entry = (MTKOFPMAP*)malloc(entry_buf.length());
+    mtk_ofp_entry *ofp_entry = (mtk_ofp_entry*)malloc(entry_buf.length());
     memcpy(ofp_entry, entry_buf.data(), entry_buf.length());
 
     int entry_count = entry_buf.length() / OFP_CONST_LEN;
@@ -177,7 +177,7 @@ qbool OfpFile::UnpackOFPEntries(qstr ofp_file, QVector<MTKOFPMAP> &entries)
         if(!ofp_entry[i].offset || !ofp_entry[i].length)
             continue;
 
-        MTKOFPMAP entry = {};
+        mtk_ofp_entry entry = {};
         memcpy(&entry, &ofp_entry[i], sizeof(ofp_entry[i]));
         entries.push_back(entry);
     }
@@ -192,10 +192,8 @@ qbool OfpFile::extract_partition(qstr ofp_file, qstr part_name, qiodev &io_dev)
     if (!qfileinfo::exists(ofp_file))
         return 0;
 
-    qfile ofp(ofp_file);
-
     mtk_ofp_hdr hdr;
-
+    qfile ofp(ofp_file);
     if (!ofp.isOpen())
     {
         if (!ofp.open(qiodev::ReadOnly))
@@ -235,7 +233,6 @@ qbool OfpFile::extract_partition(qstr ofp_file, qstr part_name, qiodev &io_dev)
     }
 
     quint hdr_entries = hdr.num_entries * OFP_CONST_LEN;
-
     if (!ofp.seek(ofp.size() - hdr_entries - OFP_HDR_LEN))
     {
         ofp.close();
@@ -245,7 +242,7 @@ qbool OfpFile::extract_partition(qstr ofp_file, qstr part_name, qiodev &io_dev)
     qbyte entry_buf = ofp.read(hdr_entries);
     mtk_shuffle(hdr_key, hdr_key.length(), entry_buf, hdr_entries);
 
-    MTKOFPMAP *ofp_entry = (MTKOFPMAP*)malloc(entry_buf.length());
+    mtk_ofp_entry *ofp_entry = (mtk_ofp_entry*)malloc(entry_buf.length());
     memcpy(ofp_entry, entry_buf.data(), entry_buf.length());
 
     int entry_count = entry_buf.length() / OFP_CONST_LEN;

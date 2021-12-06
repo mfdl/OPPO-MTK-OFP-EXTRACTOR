@@ -44,17 +44,16 @@ int main(int argc, char *argv[])
 
         qdir(out_path).mkdir(".");
 
-        QVector<MTKOFPMAP> ofp_map = {};
+        QVector<mtk_ofp_entry> ofp_map = {};
         if (!OfpFile::UnpackOFPEntries(ofp_file, ofp_map))
             return 0;
 
         qfile tmp_file = {};
-        for (QVector<MTKOFPMAP>::iterator it =
+        for (QVector<mtk_ofp_entry>::iterator it =
              ofp_map.begin(); it != ofp_map.end(); it++)
         {
-            MTKOFPMAP entry = *it;
+            mtk_ofp_entry entry = *it;
             qstr pname = entry.name;
-
             if (pname.startsWith("super."))
                 continue;
 
