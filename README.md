@@ -10,3 +10,4 @@
 * DZ = Algeria.
 * IN = India.
 * VN = Vietnam.
+* extraction algo credit to @Bjoern Kerler. ported from https://github.com/bkerler/oppo_decrypt.
