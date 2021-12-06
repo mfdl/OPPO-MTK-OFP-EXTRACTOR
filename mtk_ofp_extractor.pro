@@ -48,4 +48,3 @@ HEADERS += \
     ofpfile.h \
     type_defs.h
 
-RC_FILE = mtk_ofp_extractor.rc

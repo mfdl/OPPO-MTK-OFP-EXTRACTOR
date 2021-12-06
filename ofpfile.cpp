@@ -1,6 +1,6 @@
 #include "ofpfile.h"
 
-void OfpFile::mtk_shuffle(qbyte key, int keyLength, qbyte &data, int inputLength, bool for_key)
+void OfpFile::mtk_shuffle(qbyte key, qint keyLength, qbyte &data, qint inputLength, qbool for_key)
 {
     if (for_key)
     {
@@ -25,26 +25,26 @@ void OfpFile::decrypt_ofp_data(qbyte input, qbyte &output, mtk_ofp_sec ofp_key)
 {
     output.clear();
     AES_KEY aes_key;
-    int read, pos = 0;
-    unsigned char outBuff[4096];
+    qint pos = 0;
+    qchar outBuff[4096];
 
-    AES_set_encrypt_key((const unsigned char*)ofp_key.key.constData(), 128, &aes_key);
+    AES_set_encrypt_key((const qchar*)ofp_key.key.constData(), 128, &aes_key);
 
     qint64 length = input.length();
     qint64 startAdd = 0;
 
     while (length > 0)
     {
-        read = qMin(length, (qint64)4096);
-        AES_cfb128_encrypt((unsigned char*)input.mid(startAdd, read).data(),
-                           outBuff, read, &aes_key, (unsigned char*)ofp_key.ivc.data(), &pos, AES_DECRYPT);
+        qsizetype read = qMinLen(0x1000, length);
+        AES_cfb128_encrypt((qchar*)input.mid(startAdd, read).data(),
+                           outBuff, read, &aes_key, (qchar*)ofp_key.ivc.data(), &pos, AES_DECRYPT);
         output.append((char*)outBuff, read);
         length -= read;
         startAdd += read;
     }
 }
 
-bool OfpFile::mtk_ofp_gen_key(qbyte enc_ofp_buf, mtk_ofp_sec &ofp_key)
+qbool OfpFile::mtk_ofp_gen_key(qbyte enc_ofp_buf, mtk_ofp_sec &ofp_key)
 {
     qstr ofp_keys[9][3] = {{}};
 
@@ -84,7 +84,7 @@ bool OfpFile::mtk_ofp_gen_key(qbyte enc_ofp_buf, mtk_ofp_sec &ofp_key)
     ofp_keys[8][1].append("ab3f76d7989207f2");
     ofp_keys[8][2].append("2bf515b3a9737835");
 
-    bool key_match = false;
+    qbool key_match = false;
     for(int i = 0; i < 9; ++i)
     {
         if(ofp_keys[i][0] != "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
@@ -123,7 +123,7 @@ bool OfpFile::mtk_ofp_gen_key(qbyte enc_ofp_buf, mtk_ofp_sec &ofp_key)
     return key_match;
 }
 
-bool OfpFile::UnpackOFPEntries(qstr ofp_file, QVector<MTKOFPMAP> &entries)
+qbool OfpFile::UnpackOFPEntries(qstr ofp_file, QVector<MTKOFPMAP> &entries)
 {
     if(!qfileinfo(ofp_file).size())
         return 0;
@@ -187,7 +187,7 @@ bool OfpFile::UnpackOFPEntries(qstr ofp_file, QVector<MTKOFPMAP> &entries)
 }
 
 
-bool OfpFile::extract_partition(qstr ofp_file, qstr part_name, qiodev &io_dev)
+qbool OfpFile::extract_partition(qstr ofp_file, qstr part_name, qiodev &io_dev)
 {
     if (!qfileinfo::exists(ofp_file))
         return 0;
@@ -310,7 +310,7 @@ bool OfpFile::extract_partition(qstr ofp_file, qstr part_name, qiodev &io_dev)
     return true;
 }
 
-bool OfpFile::extract_partitions(qstr ofp_file, qstrl parts, qstr super_part, qstr super_io)
+qbool OfpFile::extract_partitions(qstr ofp_file, qstrl parts, qstr super_part, qstr super_io)
 {
     foreach (qstr part, parts)
     {
@@ -329,7 +329,7 @@ bool OfpFile::extract_partitions(qstr ofp_file, qstrl parts, qstr super_part, qs
     return 1;
 }
 
-bool OfpFile::ConvertSparse(qstr super_part, qstr super_io)
+qbool OfpFile::ConvertSparse(qstr super_part, qstr super_io)
 {
     qfile in(super_part);
     qfile out(super_io);
@@ -447,7 +447,6 @@ bool OfpFile::ConvertSparse(qstr super_part, qstr super_io)
 
     return 1;
 }
-
 
 qbool OfpFile::read_file(qstr path, qbyte &output, qlong offset, qlong length)
 {
