@@ -39,10 +39,8 @@ int main(int argc, char *argv[])
 
         qstr out_path = qfileinfo(ofp_dev).absolutePath() +"/" +
                 qfileinfo(ofp_dev).fileName().replace(".ofp", qstr());
-        if(qdir(out_path).exists())
-            qdir(out_path).removeRecursively();
-
-        qdir(out_path).mkdir(".");
+        if(!qdir(out_path).exists())
+            qdir(out_path).mkdir(".");
 
         QVector<mtk_ofp_entry> ofp_map = {};
         if (!OfpFile::UnpackOFPEntries(ofp_file, ofp_map))
